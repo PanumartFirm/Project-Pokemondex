@@ -1,0 +1,48 @@
+version: "3.0"
+services:
+   laravel-web:
+     depends_on:
+       - laravel-db
+     container_name: laravel-web
+     image: bitnami/laravel:latest
+     environment:
+       - DB_HOST=laravel-db
+       - DB_USERNAME=root
+       - DB_DATABASE=pokemon
+       - DB_PASSWORD=123456
+     ports:          
+       - "80:3000"
+     networks:
+       - laraveldev_net
+     restart: always
+     volumes:
+       - ./app:/app
+       - ./webdata:/root
+
+   laravel-db:
+     container_name: laravel-db
+     image: mysql:5.7
+     environment:
+       - MYSQL_ROOT_PASSWORD=123456
+     networks:
+       - laraveldev_net
+     restart: always
+     volumes:
+       - ./mysql:/var/lib/mysql
+       - ./data:/root
+     command: --innodb_use_native_aio=0
+
+   laravel-phpmyadmin:
+     container_name: laravel-phpmyadmin
+     image: phpmyadmin/phpmyadmin
+     environment:
+       - PMA_HOST=laravel-db
+     ports:
+       - "81:80"
+     networks:
+       - laraveldev_net
+     restart: always
+
+networks:
+   laraveldev_net:
+     driver: bridge
